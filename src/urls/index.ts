@@ -1,7 +1,7 @@
 const URLS = {
   Base: '/',
-  New: '/new',
-  Todo: '/todo/:id',
+  Todo: '/todo',
+  ID: ':id',
   Others: '*',
 };
 
