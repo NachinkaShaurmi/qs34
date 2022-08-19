@@ -1,0 +1,14 @@
+.root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.container {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  background-color: #f9f9f9;
+}
