@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  border: 0;
   box-sizing: border-box;
 }
 
@@ -25,7 +26,7 @@ button {
   padding: 5px 10px;
   margin: 5px 10px;
 
-  transition: background-color .4s;
+  transition: background-color 0.4s;
 
   &:hover {
     background-color: #888;
@@ -35,9 +36,23 @@ button {
 a {
   all: unset;
   cursor: pointer;
-  transition: color .4s;
+  transition: color 0.4s;
 
   &:hover {
-    color:aqua;
+    color: aqua;
   }
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+input[type="submit"] {
+  cursor: pointer;
+}
+
+input[type="submit"]:disabled,
+button:disabled {
+  cursor: not-allowed;
 }

@@ -16,7 +16,7 @@ export const GET_ALL_TODO = gql`
 `;
 
 export const GET_ONE_TODO = gql`
-  query ($id: ID) {
+  query ($id: ID!) {
     todo(id: $id) {
       id
       title

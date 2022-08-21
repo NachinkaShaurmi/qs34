@@ -9,7 +9,7 @@ const Header: React.FC = () => {
     <div className={styles.wrapper}>
       <div className={styles.navigate}>
         <NavLink to={URLS.Base}>Todos List</NavLink>
-        <NavLink to={URLS.Todo}>Create todo</NavLink>
+        <NavLink to={URLS.New}>Create todo</NavLink>
       </div>
     </div>
   );

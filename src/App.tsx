@@ -8,7 +8,8 @@ function App() {
   return (
     <Routes>
       <Route path={URLS.Base} element={<TodosList />} />
-      <Route path={URLS.Todo} element={<Todo />}>
+      <Route path={URLS.New} element={<></>} />
+      <Route path={URLS.Todo}>
         <Route path={URLS.ID} element={<Todo />} />
       </Route>
     </Routes>

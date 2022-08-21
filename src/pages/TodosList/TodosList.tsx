@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { GET_ALL_TODO } from "query/todo";
 import { ITodo, ITodosPage } from "types";
 import DefaultLayout from "layout/DefaultLayout";
+import { Link } from "react-router-dom";
+import URLS from "urls";
 
 const TodosList = () => {
   const { data, loading, refetch } = useQuery<ITodosPage>(GET_ALL_TODO);
@@ -19,22 +21,27 @@ const TodosList = () => {
     refetch();
   };
 
-  if (loading) {
-    return <h2>Loading...</h2>;
-  }
   return (
     <DefaultLayout>
-      <div className="btns">
-        <button onClick={() => getAll()}>Get all</button>
-      </div>
-      <div>
-        {!!todos &&
-          todos.map((todo) => (
-            <div className="user">
-              {todo.id}. {todo.title} {todo.completed ? "DONE" : "IN PROGRESS"}
-            </div>
-          ))}
-      </div>
+      {loading && <h2>Loading...</h2>}
+      {!loading && (
+        <>
+          <div className="btns">
+            <button onClick={() => getAll()}>Get all</button>
+          </div>
+          <ul>
+            {!!todos &&
+              todos.map((todo) => (
+                <li className="todo" key={todo.id}>
+                  <Link to={`${URLS.Todo}/${todo.id}`}>
+                    {todo.id}. {todo.title}{" "}
+                    {todo.completed ? "DONE" : "IN PROGRESS"}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </>
+      )}
     </DefaultLayout>
   );
 };
