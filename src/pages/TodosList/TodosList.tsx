@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import { GET_ALL_TODO } from "query/todo";
 import { ITodo, ITodosPage } from "types";
 import DefaultLayout from "layout/DefaultLayout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import URLS from "urls";
 
 const TodosList = () => {
-  const { data, loading, refetch } = useQuery<ITodosPage>(GET_ALL_TODO);
+  const navigate = useNavigate();
+
+  const { data, loading, refetch, error } = useQuery<ITodosPage>(GET_ALL_TODO);
 
   const [todos, setTodos] = useState<ITodo[]>();
 
@@ -16,6 +18,10 @@ const TodosList = () => {
       setTodos(data?.todos.data);
     }
   }, [data, loading]);
+
+  useEffect(() => {
+    if (error) navigate(URLS.Error);
+  }, [navigate, error]);
 
   const getAll = () => {
     refetch();
@@ -27,7 +33,7 @@ const TodosList = () => {
       {!loading && (
         <>
           <div className="btns">
-            <button onClick={() => getAll()}>Get all</button>
+            <button disabled={loading} onClick={() => getAll()}>Get all</button>
           </div>
           <ul>
             {!!todos &&

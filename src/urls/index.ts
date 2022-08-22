@@ -3,6 +3,7 @@ const URLS = {
   Todo: '/todo',
   New: '/new',
   ID: ':id',
+  Error: '/error',
   Others: '*',
 };
 

@@ -4,8 +4,9 @@ import DefaultLayout from "layout/DefaultLayout";
 import { UPDATE_TODO, CREATE_TODO } from "mutation/todo";
 import { GET_ONE_TODO } from "query/todo";
 import React, { FormEventHandler, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ITodo } from "types";
+import URLS from "urls";
 
 export enum TodoType {
   Create = "create",
@@ -20,6 +21,7 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
   const isUpdate = type === TodoType.Update;
 
   const { id: todoId } = useParams();
+  const navigate = useNavigate();
 
   const [getTodo, { data, loading }] = useLazyQuery<{ todo: ITodo }>(
     GET_ONE_TODO,
@@ -30,8 +32,10 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
     }
   );
 
-  const [createTodo, { loading: createTodoLoading }] = useMutation(CREATE_TODO);
-  const [updateTodo, { loading: updateTodoLoading }] = useMutation(UPDATE_TODO);
+  const [createTodo, { loading: createTodoLoading, error: createError }] =
+    useMutation(CREATE_TODO);
+  const [updateTodo, { loading: updateTodoLoading, error: updateError }] =
+    useMutation(UPDATE_TODO);
 
   const [title, setTitle] = useState("");
   const [checked, setChecked] = useState(false);
@@ -50,6 +54,10 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
     }
   }, [data, loading]);
 
+  useEffect(() => {
+    if (createError || updateError) navigate(URLS.Error);
+  }, [navigate, createError, updateError]);
+
   const handleChecked = () => {
     setChecked(!checked);
   };
@@ -61,14 +69,14 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    
+
     if (isUpdate) {
       updateTodo({
         variables: {
           id: todo?.id,
           input: inputData,
         },
-      })
+      });
     } else {
       createTodo({
         variables: {
@@ -79,7 +87,8 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
   };
 
   const isChanged = todo?.completed !== checked || todo?.title !== title;
-  const disableCondition = !isChanged || loading || createTodoLoading || updateTodoLoading;
+  const disableCondition =
+    !isChanged || loading || createTodoLoading || updateTodoLoading;
   return (
     <DefaultLayout>
       {loading && <h2>Loading...</h2>}
