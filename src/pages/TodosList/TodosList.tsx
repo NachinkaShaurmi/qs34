@@ -1,21 +1,25 @@
 import { useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { GET_ALL_TODO } from "query/todo";
 import { ITodo, ITodosPage } from "types";
 import DefaultLayout from "layout/DefaultLayout";
 import { useNavigate } from "react-router-dom";
 import URLS from "urls";
 import List from "components/List/List";
+import Filter from "components/Filter/Filter";
 
 const TodosList = () => {
   const navigate = useNavigate();
 
-  const { data, loading, refetch, error } = useQuery<ITodosPage>(GET_ALL_TODO);
+  const { data, loading, refetch, error } = useQuery<ITodosPage>(
+    GET_ALL_TODO,
+    {}
+  );
 
   const [todos, setTodos] = useState<ITodo[]>([]);
 
   useEffect(() => {
-    if (!loading && (data?.todos.data.length)) {
+    if (!loading && data?.todos.data.length) {
       setTodos(data.todos.data);
     }
   }, [data, loading]);
@@ -24,20 +28,25 @@ const TodosList = () => {
     if (error) navigate(URLS.Error);
   }, [navigate, error]);
 
-  const getAll = () => {
-    refetch();
-  };
+  const filterCallBack = useCallback(
+    (str: string) => {
+      refetch({
+        options: {
+          search: { q: str },
+        },
+      });
+    },
+    [refetch]
+  );
 
   return (
     <DefaultLayout>
       {loading && <h2>Loading...</h2>}
       {!loading && (
-        <>
-          <div className="btns">
-            <button disabled={loading} onClick={() => getAll()}>Get all</button>
-          </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Filter cbFunction={filterCallBack} />
           <List todos={todos} />
-        </>
+        </div>
       )}
     </DefaultLayout>
   );

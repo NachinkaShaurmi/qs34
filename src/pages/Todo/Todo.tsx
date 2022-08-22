@@ -83,6 +83,7 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
           input: inputData,
         },
       });
+      // TODO add redirect on success
     }
   };
 

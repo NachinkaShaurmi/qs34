@@ -13,7 +13,7 @@ function App() {
         <Route path={URLS.ID} element={<Todo type={TodoType.Update}/>} />
       </Route>
       <Route path={URLS.Error} element={<>Error page</>} />
-      <Route path={URLS.Others} element={<TodosList />} />
+      <Route path={URLS.Others} element={<>Not found page</>} />
     </Routes>
   );
 }
