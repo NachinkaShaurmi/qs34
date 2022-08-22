@@ -1,26 +1,45 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useLazyQuery } from "@apollo/client";
 import Checkbox from "components/Checkbox/Checkbox";
 import DefaultLayout from "layout/DefaultLayout";
-import { UPDATE_TODO } from "mutation/todo";
+import { UPDATE_TODO, CREATE_TODO } from "mutation/todo";
 import { GET_ONE_TODO } from "query/todo";
 import React, { FormEventHandler, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ITodo } from "types";
 
-const Todo = () => {
+export enum TodoType {
+  Create = "create",
+  Update = "update",
+}
+
+interface ITodoProps {
+  type: TodoType;
+}
+
+const Todo: React.FC<ITodoProps> = ({ type }) => {
+  const isUpdate = type === TodoType.Update;
+
   const { id: todoId } = useParams();
 
-  const { data, loading } = useQuery<{ todo: ITodo }>(GET_ONE_TODO, {
-    variables: {
-      id: todoId,
-    },
-  });
+  const [getTodo, { data, loading }] = useLazyQuery<{ todo: ITodo }>(
+    GET_ONE_TODO,
+    {
+      variables: {
+        id: todoId,
+      },
+    }
+  );
 
-  const [newTodo] = useMutation(UPDATE_TODO);
+  const [createTodo, { loading: createTodoLoading }] = useMutation(CREATE_TODO);
+  const [updateTodo, { loading: updateTodoLoading }] = useMutation(UPDATE_TODO);
 
   const [title, setTitle] = useState("");
   const [checked, setChecked] = useState(false);
   const [todo, setTodo] = useState<ITodo>();
+
+  useEffect(() => {
+    if (todoId && isUpdate) getTodo();
+  }, [todoId, getTodo, isUpdate]);
 
   useEffect(() => {
     if (!loading && data?.todo) {
@@ -35,21 +54,32 @@ const Todo = () => {
     setChecked(!checked);
   };
 
+  const inputData = {
+    title,
+    completed: checked,
+  };
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    newTodo({
-      variables: {
-        id: todo?.id,
-        input: {
-          title,
-          completed: checked,
+    
+    if (isUpdate) {
+      updateTodo({
+        variables: {
+          id: todo?.id,
+          input: inputData,
         },
-      },
-    }).then(({ data }) => {
-      console.log(data);
-    });
+      })
+    } else {
+      createTodo({
+        variables: {
+          input: inputData,
+        },
+      });
+    }
   };
+
   const isChanged = todo?.completed !== checked || todo?.title !== title;
+  const disableCondition = !isChanged || loading || createTodoLoading || updateTodoLoading;
   return (
     <DefaultLayout>
       {loading && <h2>Loading...</h2>}
@@ -67,11 +97,11 @@ const Todo = () => {
             value={!!checked}
             onChange={handleChecked}
           />
-          <input type="submit" value="Save" disabled={!isChanged} />
+          <input type="submit" value="Save" disabled={disableCondition} />
         </form>
       )}
     </DefaultLayout>
   );
 };
 
-export default Todo;
+export default React.memo(Todo);
