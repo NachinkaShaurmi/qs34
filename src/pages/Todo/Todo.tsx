@@ -87,7 +87,7 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
           input: inputData,
         },
       });
-      // TODO add redirect on success
+      // TODO add redirect on todo new page
     }
   };
 
@@ -102,12 +102,15 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
   };
 
   const isChanged = todo?.completed !== checked || todo?.title !== title;
+
   const loading =
     getTodoLoading ||
     createTodoLoading ||
     updateTodoLoading ||
     deleteTodoLoading;
+  
   const disableCondition = !isChanged || loading;
+
   return (
     <DefaultLayout>
       {getTodoLoading && <h2>Loading...</h2>}
@@ -120,10 +123,13 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
               name="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              minLength={6}
+              maxLength={120}
+              pattern='^[0-9a-zA-Z\s]+$'
             />
             <Checkbox
               label="completed"
-              value={!!checked}
+              value={checked}
               onChange={handleChecked}
             />
             <input type="submit" value="Save" disabled={disableCondition} />
