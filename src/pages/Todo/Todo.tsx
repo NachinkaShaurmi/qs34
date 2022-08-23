@@ -109,7 +109,7 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
     updateTodoLoading ||
     deleteTodoLoading;
   
-  const disableCondition = !isChanged || loading;
+  const disableFormSubmitCondition = !isChanged || loading;
 
   return (
     <DefaultLayout>
@@ -132,7 +132,7 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
               value={checked}
               onChange={handleChecked}
             />
-            <input type="submit" value="Save" disabled={disableCondition} />
+            <input type="submit" value="Save" disabled={disableFormSubmitCondition} />
           </form>
           <Button title="Remove" onClick={handleDelete} disabled={loading} />
         </div>
