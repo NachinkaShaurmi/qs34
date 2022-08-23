@@ -18,6 +18,8 @@ const TodosList = () => {
 
   const [todos, setTodos] = useState<ITodo[]>([]);
 
+  const [title, setTitle] = useState("");
+
   useEffect(() => {
     if (!loading && data?.todos.data.length) {
       setTodos(data.todos.data);
@@ -44,7 +46,7 @@ const TodosList = () => {
       {loading && <h2>Loading...</h2>}
       {!loading && (
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <Filter cbFunction={filterCallBack} />
+          <Filter cbFunction={filterCallBack} title={title} setTitle={setTitle} />
           <List todos={todos} />
         </div>
       )}

@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface IFilter {
   cbFunction: (str: string) => void;
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Filter: React.FC<IFilter> = ({ cbFunction }) => {
-  const [title, setTitle] = useState("");
+const Filter: React.FC<IFilter> = ({ cbFunction, title, setTitle }) => {
 
   const filterHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
