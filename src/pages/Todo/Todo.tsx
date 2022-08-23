@@ -1,7 +1,8 @@
 import { useMutation, useLazyQuery } from "@apollo/client";
+import Button from "components/Button/Button";
 import Checkbox from "components/Checkbox/Checkbox";
 import DefaultLayout from "layout/DefaultLayout";
-import { UPDATE_TODO, CREATE_TODO } from "mutation/todo";
+import { UPDATE_TODO, CREATE_TODO, DELETE_TODO } from "mutation/todo";
 import { GET_ONE_TODO } from "query/todo";
 import React, { FormEventHandler, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,19 +24,22 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
   const { id: todoId } = useParams();
   const navigate = useNavigate();
 
-  const [getTodo, { data, loading }] = useLazyQuery<{ todo: ITodo }>(
-    GET_ONE_TODO,
-    {
-      variables: {
-        id: todoId,
-      },
-    }
-  );
+  const [getTodo, { data, loading: getTodoLoading }] = useLazyQuery<{
+    todo: ITodo;
+  }>(GET_ONE_TODO, {
+    variables: {
+      id: todoId,
+    },
+  });
 
   const [createTodo, { loading: createTodoLoading, error: createError }] =
     useMutation(CREATE_TODO);
+
   const [updateTodo, { loading: updateTodoLoading, error: updateError }] =
     useMutation(UPDATE_TODO);
+
+  const [deleteTodo, { loading: deleteTodoLoading, error: deleteError }] =
+    useMutation(DELETE_TODO);
 
   const [title, setTitle] = useState("");
   const [checked, setChecked] = useState(false);
@@ -46,17 +50,17 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
   }, [todoId, getTodo, isUpdate]);
 
   useEffect(() => {
-    if (!loading && data?.todo) {
+    if (!getTodoLoading && data?.todo) {
       const { completed, title } = data.todo;
       setTodo(data.todo);
       setTitle(title);
       setChecked(completed);
     }
-  }, [data, loading]);
+  }, [data, getTodoLoading]);
 
   useEffect(() => {
-    if (createError || updateError) navigate(URLS.Error);
-  }, [navigate, createError, updateError]);
+    if (createError || updateError || deleteError) navigate(URLS.Error);
+  }, [navigate, createError, updateError, deleteError]);
 
   const handleChecked = () => {
     setChecked(!checked);
@@ -87,28 +91,45 @@ const Todo: React.FC<ITodoProps> = ({ type }) => {
     }
   };
 
+  const handleDelete = () => {
+    deleteTodo({
+      variables: {
+        id: todo?.id,
+      },
+    }).then((res) => {
+      if (res.data.deleteTodo) navigate(URLS.Base, { replace: true });
+    });
+  };
+
   const isChanged = todo?.completed !== checked || todo?.title !== title;
-  const disableCondition =
-    !isChanged || loading || createTodoLoading || updateTodoLoading;
+  const loading =
+    getTodoLoading ||
+    createTodoLoading ||
+    updateTodoLoading ||
+    deleteTodoLoading;
+  const disableCondition = !isChanged || loading;
   return (
     <DefaultLayout>
-      {loading && <h2>Loading...</h2>}
-      {!loading && (
-        <form onSubmit={handleSubmit}>
-          <div>Todo {todoId}</div>
-          <input
-            type="text"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <Checkbox
-            label="completed"
-            value={!!checked}
-            onChange={handleChecked}
-          />
-          <input type="submit" value="Save" disabled={disableCondition} />
-        </form>
+      {getTodoLoading && <h2>Loading...</h2>}
+      {!getTodoLoading && (
+        <div>
+          <form onSubmit={handleSubmit}>
+            <div>Todo {todoId}</div>
+            <input
+              type="text"
+              name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <Checkbox
+              label="completed"
+              value={!!checked}
+              onChange={handleChecked}
+            />
+            <input type="submit" value="Save" disabled={disableCondition} />
+          </form>
+          <Button title="Remove" onClick={handleDelete} disabled={loading} />
+        </div>
       )}
     </DefaultLayout>
   );
