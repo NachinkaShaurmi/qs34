@@ -1,12 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface IFilter {
   cbFunction: (str: string) => void;
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Filter: React.FC<IFilter> = ({ cbFunction, title, setTitle }) => {
+const Filter: React.FC<IFilter> = ({ cbFunction }) => {
+  const [title, setTitle] = useState("");
 
   const filterHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -14,7 +13,13 @@ const Filter: React.FC<IFilter> = ({ cbFunction, title, setTitle }) => {
   };
 
   return (
-    <input type="text" name="title" value={title} onChange={filterHandler} />
+    <input
+      autoFocus
+      type="text"
+      name="title"
+      value={title}
+      onChange={filterHandler}
+    />
   );
 };
 
